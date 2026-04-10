@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+
+class CliGestion:
+    '''
+    Commande line gestion class using fire
+    '''
+
+    def index(self, max_chunk_size: int = 2000):
+        '''
+        Handle the index flag
+
+        Args:
+            max_chunk_size: int = The max size of a chunk
+        Return:
+            None
+        '''
+        pass
+
+    def answer(self, prompt: str, k: int = 10):
+        '''
+        Handle the answer flag
+
+        Args:
+            prompt: str = The prompt to answer
+            k: int = The number of answer to retrieve
+        Return
+            None
+        '''
+        pass
+
+    def answer_dataset(
+                self,
+                student_search_results_path: str = (
+                    "data/output/search_results/dataset_docs_public.json"
+                ),
+                save_directory: str = (
+                    "data/output/search_results_and_answer"
+                )
+            ):
+        '''
+        Handle the answer_dataset flag
+
+        Args:
+            student_search_results_path: str =
+                The path to the student serach result
+            save_directory: str = The directory to save the result
+        Return
+            None
+        '''
+        pass
+
+    def search_dataset(
+                self,
+                dataset_path: str = (
+                    "data/datasets/UnansweredQuestions" +
+                    "/dataset_docs_public.json"
+                ),
+                save_directory: str = "data/output/search_results",
+                k: int = 10
+            ):
+        '''
+        Handle the search_data flag
+
+        Args:
+            dataset_path: str = The path to get the datasets
+        Return
+            None
+        '''
+        pass
