@@ -5,7 +5,7 @@ class CliGestion:
     Commande line gestion class using fire
     '''
 
-    def index(self, max_chunk_size: int = 2000):
+    def index(self, max_chunk_size: int = 2000) -> None:
         '''
         Handle the index flag
 
@@ -16,7 +16,7 @@ class CliGestion:
         '''
         pass
 
-    def answer(self, prompt: str, k: int = 10):
+    def answer(self, prompt: str, k: int = 10) -> None:
         '''
         Handle the answer flag
 
@@ -36,7 +36,7 @@ class CliGestion:
                 save_directory: str = (
                     "data/output/search_results_and_answer"
                 )
-            ):
+            ) -> None:
         '''
         Handle the answer_dataset flag
 
@@ -57,13 +57,24 @@ class CliGestion:
                 ),
                 save_directory: str = "data/output/search_results",
                 k: int = 10
-            ):
+            ) -> None:
         '''
         Handle the search_data flag
 
         Args:
             dataset_path: str = The path to get the datasets
         Return
+            None
+        '''
+        pass
+
+    def evaluate(self) -> None:
+        '''
+        Handle the evaluate flag
+
+        Args:
+            None
+        Return:
             None
         '''
         pass

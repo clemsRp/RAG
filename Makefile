@@ -1,22 +1,36 @@
 
+NAME = src
+EXEC = python3
+DEBUGER = pdb
+
 install:
 	uv sync
 
 run:
-	uv run python3 -m src
+	uv run $(EXEC) -m $(NAME)
 
 debug:
-	uv run python3 -m pdb -m src
+	uv run $(EXEC) -m $(DEBUGER) -m $(NAME)
 
 lint:
-	uv run flake8 . --exclude=.venv
-	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	uv run flake8 . --exclude=.venv,vllm-0.10.1
+	uv run mypy . \
+		--warn-return-any \
+		--warn-unused-ignores \
+		--ignore-missing-imports \
+		--disallow-untyped-defs \
+		--check-untyped-defs \
+		--exclude "(\.venv|vllm-0.10.1)"
+
+lint-strict:
+	uv run flake8 . --exclude=.venv,vllm-0.10.1
+	uv run mypy . --exclude "(\.venv|vllm-0.10.1)" --strict
 
 clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} +
 	rm -rf .mypy_cache
-	rm -rf .venv
-	rm -rf src/__pycache__
-	rm -rf __pycache__
-	rm -rf .vscode
+	rm -rf .pytest_cache
+	rm -rf *.pyc
+	rm -rf .venv .python-version main.py
 
-.PHONY: install run debug lint clean fclean
+.PHONY: install run debug lint lint-strict clean
