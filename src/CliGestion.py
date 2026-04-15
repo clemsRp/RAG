@@ -14,7 +14,8 @@ class CliGestion:
         Return:
             None
         '''
-        pass
+        if max_chunk_size > 2000:
+            max_chunk_size = 2000
 
     def answer(self, prompt: str, k: int = 10) -> None:
         '''
@@ -44,6 +45,18 @@ class CliGestion:
             student_search_results_path: str =
                 The path to the student serach result
             save_directory: str = The directory to save the result
+        Return
+            None
+        '''
+        pass
+
+    def search(self, prompt: str, k: int = 10) -> None:
+        '''
+        Handle the search flag
+
+        Args:
+            prompt: str = The prompt to search
+            k: int = The number of search to retrieve
         Return
             None
         '''
