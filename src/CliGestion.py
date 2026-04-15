@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+from src.Chunker import Chunker
+
+
 class CliGestion:
     '''
     Commande line gestion class using fire
@@ -16,6 +19,10 @@ class CliGestion:
         '''
         if max_chunk_size > 2000:
             max_chunk_size = 2000
+
+        chunker: Chunker = Chunker()
+
+        chunker.chunk_files(max_chunk_size)
 
     def answer(self, prompt: str, k: int = 10) -> None:
         '''
