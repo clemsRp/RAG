@@ -117,9 +117,3 @@ class StudentSearchResultsAndAnswer(StudentSearchResults):
         None
     '''
     search_results: list[MinimalAnswer]
-
-
-class FileError(Exception):
-    '''
-    Raise an error for an invalid file type
-    '''

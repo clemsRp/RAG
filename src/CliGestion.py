@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import bm25s
 from src.Chunker import Chunker
+from src.DataModels import MinimalSource
 
 
 class CliGestion:
@@ -17,12 +19,32 @@ class CliGestion:
         Return:
             None
         '''
-        if max_chunk_size > 2000:
-            max_chunk_size = 2000
+        # Handle the max_chunk_size
+        max_chunk_size = min([max_chunk_size, 2000])
 
+        # Chunk the files
         chunker: Chunker = Chunker()
+        chunks: list[tuple[str, MinimalSource]] = (
+            chunker.chunk_files(max_chunk_size)
+        )
 
-        chunker.chunk_files(max_chunk_size)
+        # Get the content and the datas about the chunks
+        texts: list[str] = [
+            chunk[0] for chunk in chunks
+        ]
+        sources: list[MinimalSource] = [
+            chunk[1].model_dump() for chunk in chunks
+        ]
+
+        # Tokenize the contents
+        corpus_tokens = bm25s.tokenize(texts)
+
+        # Link the contents with the datas
+        retriever = bm25s.BM25(corpus=sources)
+        retriever.index(corpus_tokens)
+
+        # Save the datas
+        retriever.save("bm25_index", corpus=sources)
 
     def answer(self, prompt: str, k: int = 10) -> None:
         '''
