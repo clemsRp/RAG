@@ -49,7 +49,7 @@ class CliGestion:
 
         print("Ingestion complete! Indices saved under data/processed/")
 
-    def search(self, prompt: str, k: int = 10) -> None:
+    def search(self, prompt: str, k: int = 10) -> list[dict[str, str | int]]:
         '''
         Handle the search flag
 
@@ -57,9 +57,27 @@ class CliGestion:
             prompt: str = The prompt to search
             k: int = The number of search to retrieve
         Return
-            None
+            results: list[dict[str, str | int]] =
+                The top k best results
         '''
-        pass
+        query_tokens = bm25s.tokenize([prompt])
+
+        # Get the k best results
+        retriever = bm25s.BM25.load("data/processed/", load_corpus=True)
+        results = retriever.retrieve(query_tokens, k=k)[0]
+
+        # Print the results
+        start: str = "first_character_index"
+        end: str = "last_character_index"
+
+        print(f"Top {k} best results:\n")
+
+        for (i, r) in enumerate(results[0]):
+            complete: int = (len(str(k)) - len(str(i + 1)))
+            print(
+                    f"{" " * complete}{i + 1}. "
+                    f"{r["file_path"]}: {r[start]} -> {r[end]}"
+                )
 
     def search_dataset(
                 self,
@@ -90,7 +108,26 @@ class CliGestion:
         Return
             None
         '''
-        pass
+        query_tokens = bm25s.tokenize([prompt])
+
+        # Get the k best results
+        retriever = bm25s.BM25.load("data/processed/", load_corpus=True)
+        results = retriever.retrieve(query_tokens, k=k)[0]
+
+        # Print the results
+        start: str = "first_character_index"
+        end: str = "last_character_index"
+
+        print(f"Top {k} best results:\n")
+
+        for (i, r) in enumerate(results[0]):
+            complete: int = (len(str(k)) - len(str(i + 1)))
+            print(
+                    f"{" " * complete}{i + 1}. "
+                    f"{r["file_path"]}: {r[start]} -> {r[end]}\n"
+                )
+
+        answer: str = 
 
     def answer_dataset(
                 self,
