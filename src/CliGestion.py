@@ -124,10 +124,12 @@ class CliGestion:
             complete: int = (len(str(k)) - len(str(i + 1)))
             print(
                     f"{" " * complete}{i + 1}. "
-                    f"{r["file_path"]}: {r[start]} -> {r[end]}\n"
+                    f"{r["file_path"]}: {r[start]} -> {r[end]}"
                 )
 
-        answer: str = 
+        answer: str = "crappo"
+
+        print(f"\nAnswer: '{answer}'")
 
     def answer_dataset(
                 self,
