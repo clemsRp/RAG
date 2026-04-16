@@ -45,7 +45,40 @@ class CliGestion:
         retriever.index(corpus_tokens)
 
         # Save the datas
-        retriever.save("bm25_index", corpus=sources)
+        retriever.save("data/processed/", corpus=sources)
+
+        print("Ingestion complete! Indices saved under data/processed/")
+
+    def search(self, prompt: str, k: int = 10) -> None:
+        '''
+        Handle the search flag
+
+        Args:
+            prompt: str = The prompt to search
+            k: int = The number of search to retrieve
+        Return
+            None
+        '''
+        pass
+
+    def search_dataset(
+                self,
+                dataset_path: str = (
+                    "data/datasets/UnansweredQuestions" +
+                    "/dataset_docs_public.json"
+                ),
+                save_directory: str = "data/output/search_results",
+                k: int = 10
+            ) -> None:
+        '''
+        Handle the search_data flag
+
+        Args:
+            dataset_path: str = The path to get the datasets
+        Return
+            None
+        '''
+        pass
 
     def answer(self, prompt: str, k: int = 10) -> None:
         '''
@@ -75,37 +108,6 @@ class CliGestion:
             student_search_results_path: str =
                 The path to the student serach result
             save_directory: str = The directory to save the result
-        Return
-            None
-        '''
-        pass
-
-    def search(self, prompt: str, k: int = 10) -> None:
-        '''
-        Handle the search flag
-
-        Args:
-            prompt: str = The prompt to search
-            k: int = The number of search to retrieve
-        Return
-            None
-        '''
-        pass
-
-    def search_dataset(
-                self,
-                dataset_path: str = (
-                    "data/datasets/UnansweredQuestions" +
-                    "/dataset_docs_public.json"
-                ),
-                save_directory: str = "data/output/search_results",
-                k: int = 10
-            ) -> None:
-        '''
-        Handle the search_data flag
-
-        Args:
-            dataset_path: str = The path to get the datasets
         Return
             None
         '''
