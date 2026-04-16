@@ -129,13 +129,15 @@ class Chunker:
         start: int = 0
         end: int = 0
 
-        while True:
+        state: bool = True
+        while state:
             # Update the end index
             end = start + max_chunk_size - 1
 
             # Stop the while loop
             if end >= len(content):
-                break
+                state = False
+                end = len(content) - 1
 
             # Skip the characters in descending order
             while end > start + 1 and \
@@ -244,14 +246,14 @@ class Chunker:
         lines = content.splitlines(keepends=True)
 
         # Calculate the start index with the previous lines and columns
-        start = sum(
+        start: int = sum([
             len(line) for line in lines[:node.lineno - 1]
-        ) + node.col_offset
+        ]) + node.col_offset
 
         # Calculate the end index with the previous lines and columns
-        end = sum(
+        end: int = sum([
             len(line) for line in lines[:node.end_lineno - 1]
-        ) + node.end_col_offset
+        ]) + node.end_col_offset
 
         return start, end
 
@@ -274,7 +276,12 @@ class Chunker:
         sub_chunks: list[tuple[str, int, int]] = []
         cursor: int = 0
 
-        while cursor < len(global_chunk_content):
+        state: bool = True
+        while state:
+            if cursor >= len(global_chunk_content):
+                cursor = len(global_chunk_content) - 1
+                state = False
+
             chunk: str = global_chunk_content[cursor:cursor + max_chunk_size]
             start: int = global_start + cursor
             end: int = start + len(chunk)

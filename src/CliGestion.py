@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import bm25s
+from typing import Any
 from src.Chunker import Chunker
 from src.DataModels import MinimalSource
 
@@ -32,7 +33,7 @@ class CliGestion:
         texts: list[str] = [
             chunk[0] for chunk in chunks
         ]
-        sources: list[MinimalSource] = [
+        sources: list[dict[str, Any]] = [
             chunk[1].model_dump() for chunk in chunks
         ]
 
