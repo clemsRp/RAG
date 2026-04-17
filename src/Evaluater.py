@@ -59,15 +59,32 @@ class Evaluater:
             ) / nb_questions * 100
             print(f"Recall@{overlap}: {score:.3f}")
 
-    def _get_score(self, overlap: int) -> int:
+    def _get_chunk_score(
+                self,
+                overlap: int,
+                generated: tuple[int, int],
+                needed: tuple[int, int]
+            ) -> int:
         '''
         Return the Recall@k score
 
         Args:
             overlap: int = The current overlap for the Recall@k
+            generated: tuple[int, int] = The generated chunk start/end
+            needed: tuple[int, int] = The needed chunk start/end
         Return:
             res: int = The Recall@k score
         '''
-        res: int = 0
+        # Calculate the true overlap
+        common_start: int = max([
+            generated[0], needed[0]
+        ])
+        common_end: int = min([
+            generated[1], needed[2]
+        ])
 
-        return res
+        score: int = max([
+            common_end - common_start, 0
+        ]) / (needed[1] - needed[0]) * 100
+
+        return score >= overlap
