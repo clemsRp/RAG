@@ -4,6 +4,9 @@ import uuid
 from pydantic import BaseModel, Field
 
 
+BM25_PATH: str = "data/processed/bm25_index"
+
+
 class MinimalSource(BaseModel):
     '''
     Manage the minimum needed sources
@@ -117,3 +120,4 @@ class StudentSearchResultsAndAnswer(StudentSearchResults):
         None
     '''
     search_results: list[MinimalAnswer]
+    k: int

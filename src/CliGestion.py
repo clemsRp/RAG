@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
 import bm25s
+import json
 from typing import Any
+from pathlib import Path
 from src.Chunker import Chunker
-from src.DataModels import MinimalSource
+from src.Retriever import Retriever
+from src.Evaluater import Evaluater
+from src.DataModels import (
+    MinimalSource, UnansweredQuestion, StudentSearchResults, BM25_PATH
+)
 
 
 class CliGestion:
@@ -45,11 +51,11 @@ class CliGestion:
         retriever.index(corpus_tokens)
 
         # Save the datas
-        retriever.save("data/processed/", corpus=sources)
+        retriever.save(BM25_PATH, corpus=sources)
 
         print("Ingestion complete! Indices saved under data/processed/")
 
-    def search(self, prompt: str, k: int = 10) -> list[dict[str, str | int]]:
+    def search(self, prompt: str, k: int = 10) -> None:
         '''
         Handle the search flag
 
@@ -57,27 +63,23 @@ class CliGestion:
             prompt: str = The prompt to search
             k: int = The number of search to retrieve
         Return
-            results: list[dict[str, str | int]] =
-                The top k best results
+            None
         '''
-        query_tokens = bm25s.tokenize([prompt])
+        # Convert the prompt into an UnAnsweredQuestion
+        questions: list[UnansweredQuestion] = [
+            UnansweredQuestion(
+                question=prompt
+            )
+        ]
 
-        # Get the k best results
-        retriever = bm25s.BM25.load("data/processed/", load_corpus=True)
-        results = retriever.retrieve(query_tokens, k=k)[0]
+        # Get the retrieved datas
+        retriever: Retriever = Retriever()
+        student_search_results: StudentSearchResults = (
+            retriever.retrieve(questions, k)
+        )
 
         # Print the results
-        start: str = "first_character_index"
-        end: str = "last_character_index"
-
-        print(f"Top {k} best results:\n")
-
-        for (i, r) in enumerate(results[0]):
-            complete: int = (len(str(k)) - len(str(i + 1)))
-            print(
-                    f"{" " * complete}{i + 1}. "
-                    f"{r["file_path"]}: {r[start]} -> {r[end]}"
-                )
+        print(student_search_results.model_dump_json(indent=4))
 
     def search_dataset(
                 self,
@@ -93,10 +95,47 @@ class CliGestion:
 
         Args:
             dataset_path: str = The path to get the datasets
+            save_directory: str = The path for save the generated datas
+            k: int = The number of answer to retrieve
         Return
             None
         '''
-        pass
+        # Get the prompts
+        try:
+            with open(dataset_path, 'r') as f:
+                dataset: dict[str, Any] = json.load(f)
+
+        except FileNotFoundError as e:
+            raise Exception(
+                f"{e}: Check that the file exist and the path is correct"
+            )
+        except PermissionError as e:
+            raise Exception(
+                f"{e}: You don't have the rights "
+                f"for the file: '{dataset_path}'"
+            )
+
+        prompts: list[dict[str, str]] = dataset["rag_questions"]
+
+        questions: list[UnansweredQuestion] = [
+            UnansweredQuestion(
+                question_id=prompt["question_id"],
+                question=prompt["question"]
+            ) for prompt in prompts
+        ]
+        # Get the retrieved datas (getting the prompts in the retriever)
+        retriever: Retriever = Retriever()
+        student_search_results: StudentSearchResults = (
+            retriever.retrieve(questions, k)
+        )
+
+        # Save the results
+        save_path: str = save_directory + "/" + Path(dataset_path).name
+        Path(save_directory).mkdir(parents=True, exist_ok=True)
+        with open(save_path, 'w') as f:
+            f.write(student_search_results.model_dump_json(indent=4))
+
+        print(f"Saved student_search_results to {save_path}")
 
     def answer(self, prompt: str, k: int = 10) -> None:
         '''
@@ -108,28 +147,8 @@ class CliGestion:
         Return
             None
         '''
-        query_tokens = bm25s.tokenize([prompt])
-
-        # Get the k best results
-        retriever = bm25s.BM25.load("data/processed/", load_corpus=True)
-        results = retriever.retrieve(query_tokens, k=k)[0]
-
-        # Print the results
-        start: str = "first_character_index"
-        end: str = "last_character_index"
-
-        print(f"Top {k} best results:\n")
-
-        for (i, r) in enumerate(results[0]):
-            complete: int = (len(str(k)) - len(str(i + 1)))
-            print(
-                    f"{" " * complete}{i + 1}. "
-                    f"{r["file_path"]}: {r[start]} -> {r[end]}"
-                )
-
-        answer: str = "crappo"
-
-        print(f"\nAnswer: '{answer}'")
+        # TODO: Adapt search adding the answer system
+        pass
 
     def answer_dataset(
                 self,
@@ -150,15 +169,38 @@ class CliGestion:
         Return
             None
         '''
+        # TODO: Adapt search_dataset adding the answer system
         pass
 
-    def evaluate(self) -> None:
+    def evaluate(
+                self,
+                student_answer_path: str = (
+                    "data/output/search_results/" +
+                    "dataset_docs_public.json"
+                ),
+                dataset_path: str = (
+                    "data/datasets/AnsweredQuestions/" +
+                    "dataset_docs_public.json"
+                ),
+                k: int = 10,
+                max_context_length: int = 2000
+            ) -> None:
         '''
         Handle the evaluate flag
 
         Args:
-            None
+            student_answer_path: str =
+                The path for the answer generated
+            dataset_path: str = The path to get the datasets
+            k: int = The number of search to retrieve
+            max_context_length: int = The max size of the context
         Return:
             None
         '''
-        pass
+        # Handle the max_context_length
+        max_context_length = min([max_context_length, 2000])
+
+        overlaps: list[int] = [1, 3, 5, 10]
+
+        evaluater: Evaluater = Evaluater()
+        evaluater.print_evaluation_results(overlaps)
