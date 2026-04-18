@@ -6,7 +6,7 @@ from typing import Any
 from pathlib import Path
 from src.Chunker import Chunker
 from src.Retriever import Retriever
-from src.Evaluater import Evaluater
+from src.Evaluator import Evaluator
 from src.DataModels import (
     MinimalSource, UnansweredQuestion, StudentSearchResults, BM25_PATH
 )
@@ -202,5 +202,5 @@ class CliGestion:
 
         overlaps: list[int] = [1, 3, 5, 10]
 
-        evaluater: Evaluater = Evaluater()
+        evaluater: Evaluator = Evaluator()
         evaluater.print_evaluation_results(overlaps)
