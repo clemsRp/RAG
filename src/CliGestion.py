@@ -6,9 +6,12 @@ from typing import Any
 from pathlib import Path
 from src.Chunker import Chunker
 from src.Retriever import Retriever
+from src.Answerer import Answerer
 from src.Evaluator import Evaluator
 from src.DataModels import (
-    MinimalSource, UnansweredQuestion, StudentSearchResults, BM25_PATH
+    MinimalSource, UnansweredQuestion,
+    StudentSearchResults, StudentSearchResultsAndAnswer,
+    RagDataset, BM25_OUTPUT_PATH
 )
 
 
@@ -51,7 +54,7 @@ class CliGestion:
         retriever.index(corpus_tokens)
 
         # Save the datas
-        retriever.save(BM25_PATH, corpus=sources)
+        retriever.save(BM25_OUTPUT_PATH, corpus=sources)
 
         print("Ingestion complete! Indices saved under data/processed/")
 
@@ -103,7 +106,7 @@ class CliGestion:
         # Get the prompts
         try:
             with open(dataset_path, 'r') as f:
-                dataset: dict[str, Any] = json.load(f)
+                dataset_json: dict[str, Any] = json.load(f)
 
         except FileNotFoundError as e:
             raise Exception(
@@ -115,14 +118,21 @@ class CliGestion:
                 f"for the file: '{dataset_path}'"
             )
 
-        prompts: list[dict[str, str]] = dataset["rag_questions"]
+        dataset: RagDataset = (
+            RagDataset(
+                **dataset_json
+            )
+        )
+
+        prompts: list[dict[str, str]] = dataset.rag_questions
 
         questions: list[UnansweredQuestion] = [
             UnansweredQuestion(
-                question_id=prompt["question_id"],
-                question=prompt["question"]
+                question_id=prompt.question_id,
+                question=prompt.question
             ) for prompt in prompts
         ]
+
         # Get the retrieved datas (getting the prompts in the retriever)
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
@@ -147,8 +157,27 @@ class CliGestion:
         Return
             None
         '''
-        # TODO: Adapt search adding the answer system
-        pass
+        # Convert the prompt into an UnAnsweredQuestion
+        questions: list[UnansweredQuestion] = [
+            UnansweredQuestion(
+                question=prompt
+            )
+        ]
+
+        # Get the retrieved datas
+        retriever: Retriever = Retriever()
+        student_search_results: StudentSearchResults = (
+            retriever.retrieve(questions, k)
+        )
+
+        # Answer the question
+        answerer: Answerer = Answerer()
+        student_search_results_and_answer: StudentSearchResultsAndAnswer = (
+            answerer.answer(student_search_results, k)
+        )
+
+        # Print the results
+        print(student_search_results_and_answer.model_dump_json(indent=4))
 
     def answer_dataset(
                 self,
@@ -157,7 +186,8 @@ class CliGestion:
                 ),
                 save_directory: str = (
                     "data/output/search_results_and_answer"
-                )
+                ),
+                k: int = 10
             ) -> None:
         '''
         Handle the answer_dataset flag
@@ -169,13 +199,55 @@ class CliGestion:
         Return
             None
         '''
-        # TODO: Adapt search_dataset adding the answer system
-        pass
+        # Get the prompts
+        try:
+            with open(student_search_results_path, 'r') as f:
+                dataset: dict[str, Any] = json.load(f)
+
+        except FileNotFoundError as e:
+            raise Exception(
+                f"{e}: Check that the file exist and the path is correct"
+            )
+        except PermissionError as e:
+            raise Exception(
+                f"{e}: You don't have the rights "
+                f"for the file: '{student_search_results_path}'"
+            )
+
+        student_search_results: StudentSearchResults = (
+            StudentSearchResults(**dataset)
+        )
+
+        # Answer the question
+        answerer: Answerer = Answerer()
+        student_search_results_and_answer: StudentSearchResultsAndAnswer = (
+            answerer.answer(student_search_results, dataset["k"])
+        )
+
+        # Save the results
+        save_path: str = str(
+            save_directory + "/" +
+            Path(student_search_results_path).name
+        )
+        Path(save_directory).mkdir(parents=True, exist_ok=True)
+        with open(save_path, 'w') as f:
+            f.write(
+                student_search_results_and_answer.model_dump_json(indent=4)
+            )
+
+        nb_questions: int = len(student_search_results.search_results)
+
+        print(
+            f"Loaded {len(dataset['search_results'])} questions "
+            f"from {student_search_results_path}\n"
+            f"Processed {nb_questions} of {nb_questions} questions\n"
+            f"Saved student_search_results_and_answer to {save_path}"
+        )
 
     def evaluate(
                 self,
                 student_answer_path: str = (
-                    "data/output/search_results/" +
+                    "data/output/search_results_and_answer/" +
                     "dataset_docs_public.json"
                 ),
                 dataset_path: str = (
@@ -202,5 +274,47 @@ class CliGestion:
 
         overlaps: list[int] = [1, 3, 5, 10]
 
+        # Get the student answer
+        try:
+            with open(student_answer_path, 'r') as f:
+                student_answer_json: dict[str, Any] = json.load(f)
+
+        except FileNotFoundError as e:
+            raise Exception(
+                f"{e}: Check that the file exist and the path is correct"
+            )
+        except PermissionError as e:
+            raise Exception(
+                f"{e}: You don't have the rights "
+                f"for the file: '{student_answer_path}'"
+            )
+
+        student_answer: StudentSearchResultsAndAnswer = (
+            StudentSearchResultsAndAnswer(**student_answer_json)
+        )
+
+        # Get the dataset answer
+        try:
+            with open(dataset_path, 'r') as f:
+                dataset_answer_json: dict[str, Any] = json.load(f)
+
+        except FileNotFoundError as e:
+            raise Exception(
+                f"{e}: Check that the file exist and the path is correct"
+            )
+        except PermissionError as e:
+            raise Exception(
+                f"{e}: You don't have the rights "
+                f"for the file: '{dataset_path}'"
+            )
+
+        dataset_answer: RagDataset = (
+            RagDataset(**dataset_answer_json)
+        )
+
         evaluater: Evaluator = Evaluator()
-        evaluater.print_evaluation_results(overlaps)
+        evaluater.print_evaluation_results(
+            student_answer,
+            dataset_answer,
+            overlaps
+        )

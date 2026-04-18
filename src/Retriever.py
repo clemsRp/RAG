@@ -4,7 +4,7 @@ import bm25s
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
     MinimalSearchResults, StudentSearchResults,
-    BM25_PATH
+    BM25_OUTPUT_PATH
 )
 
 
@@ -27,8 +27,7 @@ class Retriever:
     def retrieve(
                 self,
                 questions: list[UnansweredQuestion],
-                k: int,
-                search_mode: bool = True
+                k: int
             ) -> StudentSearchResults:
         '''
         Retrieve the datas for a given list of questions
@@ -37,7 +36,6 @@ class Retriever:
             questions: list[UnansweredQuestion] =
                 The list of prompt to retrieve datas
             k: int = The number of search to retrieve
-            search_mode: bool = The flag to handle search and answer
         Return:
             res: list[MinimalSearchResults] =
                 The list of the datas of each questions
@@ -51,7 +49,7 @@ class Retriever:
 
             # Get the k best results
             retriever = bm25s.BM25.load(
-                BM25_PATH,
+                BM25_OUTPUT_PATH,
                 load_corpus=True
             )
             results: list[dict[str, str | int]] = (
@@ -85,9 +83,9 @@ class Retriever:
         for result in results:
             retrieved_sources.append(
                 MinimalSource(
-                    file_path=result["file_path"],
-                    first_character_index=result["first_character_index"],
-                    last_character_index=result["last_character_index"]
+                    file_path=str(result["file_path"]),
+                    first_character_index=int(result["first_character_index"]),
+                    last_character_index=int(result["last_character_index"])
                 )
             )
 

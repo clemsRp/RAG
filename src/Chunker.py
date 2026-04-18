@@ -2,6 +2,7 @@
 
 import ast
 from pathlib import Path
+from typing import Any
 from src.DataModels import MinimalSource
 
 
@@ -232,7 +233,7 @@ class Chunker:
         return res
 
     def _get_node_span(
-                self, content: str, node: ast.AST
+                self, content: str, node: Any
             ) -> tuple[int, int]:
         '''
         Return the start and the end index of the chunk

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+from src.DataModels import (
+    RagDataset,
+    StudentSearchResultsAndAnswer
+)
+
 
 class Evaluator:
     '''
@@ -19,6 +24,8 @@ class Evaluator:
 
     def print_evaluation_results(
                 self,
+                student_answer: StudentSearchResultsAndAnswer,
+                dataset_answer: RagDataset,
                 overlaps: list[int]
             ) -> None:
         '''
@@ -70,6 +77,8 @@ class Evaluator:
         '''
         res: int = 0
 
+        # TODO: Iter the questions and get their scores
+
         return res
 
     def _get_chunk_score(
@@ -93,10 +102,10 @@ class Evaluator:
             generated[0], needed[0]
         ])
         common_end: int = min([
-            generated[1], needed[2]
+            generated[1], needed[1]
         ])
 
-        score: int = max([
+        score: float = max([
             common_end - common_start, 0
         ]) / (needed[1] - needed[0]) * 100
 

@@ -5,5 +5,4 @@ from src.CliGestion import CliGestion
 
 
 if __name__ == "__main__":
-
     fire.Fire(CliGestion)
