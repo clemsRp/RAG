@@ -113,12 +113,20 @@ class Evaluator:
         Return
             res: int = The Recall@k score
         '''
-        res: float = 0
+        res: float = 0.0
 
+        # For each duo of questions
         for (student_q, dataset_q) in evaluated_questions:
+
             correcte_questions: int = 0
+
+            # We compare the dataset source
             for dataset_source in dataset_q.sources:
+
+                # With each student source
                 for student_source in student_q.retrieved_sources:
+
+                    # If the student source is good
                     if self._is_correcte_source(
                                     overlap,
                                     (
@@ -130,7 +138,11 @@ class Evaluator:
                                         dataset_source.last_character_index
                                     )
                             ):
+
+                        # We update the number of good student sources
                         correcte_questions += 1
+
+                        # And redo it with the next dataset_source
                         break
 
             res += correcte_questions / len(dataset_q.sources)
@@ -153,7 +165,7 @@ class Evaluator:
         Return:
             res: int = The Recall@k score
         '''
-        # Calculate the true overlap
+        # Calculate the true overlap start/end
         common_start: int = max([
             student_chunk[0], dataset_chunk[0]
         ])
@@ -161,8 +173,10 @@ class Evaluator:
             student_chunk[1], dataset_chunk[1]
         ])
 
+        # Calculate the true overlap
         score: float = max([
             common_end - common_start, 0
         ]) / (dataset_chunk[1] - dataset_chunk[0]) * 100
 
+        # Compare the true overlap with the minimum overlap
         return score >= overlap
