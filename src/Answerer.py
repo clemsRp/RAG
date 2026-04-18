@@ -25,8 +25,7 @@ class Answerer:
 
     def answer(
                 self,
-                student_search_results: StudentSearchResults,
-                k: int = 10
+                student_search_results: StudentSearchResults
             ) -> StudentSearchResultsAndAnswer:
         '''
         Answer the given questions
@@ -56,7 +55,7 @@ class Answerer:
 
         return StudentSearchResultsAndAnswer(
             search_results=search_results,
-            k=k
+            k=student_search_results.k
         )
 
     def _get_answer(self, result: StudentSearchResults) -> str:

@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
+# External imports
 import bm25s
 import json
 from typing import Any
 from pathlib import Path
+
+# Project imports
 from src.Chunker import Chunker
 from src.Retriever import Retriever
+from src.Parser import Parser
 from src.Answerer import Answerer
 from src.Evaluator import Evaluator
+
+# Project DataModels imports
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
     StudentSearchResults, StudentSearchResultsAndAnswer,
@@ -103,25 +109,10 @@ class CliGestion:
         Return
             None
         '''
-        # Get the prompts
-        try:
-            with open(dataset_path, 'r') as f:
-                dataset_json: dict[str, Any] = json.load(f)
-
-        except FileNotFoundError as e:
-            raise Exception(
-                f"{e}: Check that the file exist and the path is correct"
-            )
-        except PermissionError as e:
-            raise Exception(
-                f"{e}: You don't have the rights "
-                f"for the file: '{dataset_path}'"
-            )
-
+        # Get the rag_questions
+        parser: Parser = Parser()
         dataset: RagDataset = (
-            RagDataset(
-                **dataset_json
-            )
+            parser.get_rag_dataset(dataset_path)
         )
 
         prompts: list[dict[str, str]] = dataset.rag_questions
@@ -199,29 +190,16 @@ class CliGestion:
         Return
             None
         '''
-        # Get the prompts
-        try:
-            with open(student_search_results_path, 'r') as f:
-                dataset: dict[str, Any] = json.load(f)
-
-        except FileNotFoundError as e:
-            raise Exception(
-                f"{e}: Check that the file exist and the path is correct"
-            )
-        except PermissionError as e:
-            raise Exception(
-                f"{e}: You don't have the rights "
-                f"for the file: '{student_search_results_path}'"
-            )
-
+        # Get the student_search_results
+        parser: Parser = Parser()
         student_search_results: StudentSearchResults = (
-            StudentSearchResults(**dataset)
+            parser.get_student_search_results(student_search_results_path)
         )
 
         # Answer the question
         answerer: Answerer = Answerer()
         student_search_results_and_answer: StudentSearchResultsAndAnswer = (
-            answerer.answer(student_search_results, dataset["k"])
+            answerer.answer(student_search_results)
         )
 
         # Save the results
@@ -238,7 +216,7 @@ class CliGestion:
         nb_questions: int = len(student_search_results.search_results)
 
         print(
-            f"Loaded {len(dataset['search_results'])} questions "
+            f"Loaded {len(student_search_results.search_results)} questions "
             f"from {student_search_results_path}\n"
             f"Processed {nb_questions} of {nb_questions} questions\n"
             f"Saved student_search_results_and_answer to {save_path}"
@@ -269,50 +247,27 @@ class CliGestion:
         Return:
             None
         '''
-        # Handle the max_context_length
+        # Initialize the variables
+        parser: Parser = Parser()
+        evaluater: Evaluator = Evaluator()
+        overlaps: list[int] = [1, 3, 5, 10]
         max_context_length = min([max_context_length, 2000])
 
-        overlaps: list[int] = [1, 3, 5, 10]
-
         # Get the student answer
-        try:
-            with open(student_answer_path, 'r') as f:
-                student_answer_json: dict[str, Any] = json.load(f)
-
-        except FileNotFoundError as e:
-            raise Exception(
-                f"{e}: Check that the file exist and the path is correct"
-            )
-        except PermissionError as e:
-            raise Exception(
-                f"{e}: You don't have the rights "
-                f"for the file: '{student_answer_path}'"
-            )
-
         student_answer: StudentSearchResultsAndAnswer = (
-            StudentSearchResultsAndAnswer(**student_answer_json)
+            parser.get_student_search_results_and_answer(
+                student_answer_path
+            )
         )
 
         # Get the dataset answer
-        try:
-            with open(dataset_path, 'r') as f:
-                dataset_answer_json: dict[str, Any] = json.load(f)
-
-        except FileNotFoundError as e:
-            raise Exception(
-                f"{e}: Check that the file exist and the path is correct"
-            )
-        except PermissionError as e:
-            raise Exception(
-                f"{e}: You don't have the rights "
-                f"for the file: '{dataset_path}'"
-            )
-
         dataset_answer: RagDataset = (
-            RagDataset(**dataset_answer_json)
+            parser.get_rag_dataset(
+                dataset_path
+            )
         )
 
-        evaluater: Evaluator = Evaluator()
+        # Print the evaluation results
         evaluater.print_evaluation_results(
             student_answer,
             dataset_answer,
