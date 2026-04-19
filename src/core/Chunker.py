@@ -282,20 +282,17 @@ class Chunker:
         sub_chunks: list[tuple[str, int, int]] = []
         cursor: int = 0
 
-        state: bool = True
         # While there is characters left
-        while state:
-
-            # We check if we are at the end of the global chunk
-            if cursor >= len(global_chunk_content):
-                cursor = len(global_chunk_content) - 1
-                state = False
-
+        while cursor < len(global_chunk_content):
             # We add a sub-chunk
             chunk: str = global_chunk_content[cursor:cursor + max_chunk_size]
+
             start: int = global_start + cursor
-            end: int = start + len(chunk)
+            end: int = start + len(chunk) - 1
+
             sub_chunks.append((chunk, start, end))
-            cursor += max_chunk_size
+
+            # Update cursor
+            cursor += max_chunk_size - 1
 
         return sub_chunks

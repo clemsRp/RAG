@@ -284,5 +284,7 @@ class CliGestion:
         evaluater.print_evaluation_results(
             student_answer,
             dataset_answer,
-            overlaps
+            overlaps,
+            k,
+            max_context_length
         )
