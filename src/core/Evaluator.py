@@ -121,7 +121,8 @@ class Evaluator:
         for overlap in overlaps:
             score: float = self._get_score(
                 evaluated_questions,
-                overlap
+                overlap,
+                k
             ) / len(evaluated_questions) * 100
             print(f"Recall@{overlap}: {score:.3f}")
 
@@ -130,7 +131,8 @@ class Evaluator:
                 evaluated_questions: list[tuple[
                     MinimalAnswer, AnsweredQuestion | UnansweredQuestion
                 ]],
-                overlap: int
+                overlap: int,
+                k: int
             ) -> float:
         '''
         Return the Recall@k score
@@ -140,6 +142,7 @@ class Evaluator:
                 MinimalAnswer, AnsweredQuestion
             ]] = The question to calculte the Recall@k score
             overlap: int = The current overlap for the Recall@k
+            k: int = The maximum number of source to check for each question
         Return
             res: int = The Recall@k score
         '''
@@ -155,8 +158,15 @@ class Evaluator:
                 continue
             for dataset_source in dataset_q.sources:
 
+                length: int = min([
+                    len(student_q.retrieved_sources),
+                    k
+                ])
+
                 # With each student source
-                for student_source in student_q.retrieved_sources:
+                for i in range(length):
+
+                    student_source = student_q.retrieved_sources[i]
 
                     # Same file
                     student_file: str = student_source.file_path
