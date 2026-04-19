@@ -127,3 +127,8 @@ class Parser:
                 f"{e}: You don't have the rights "
                 f"for the file: '{file_path}'"
             )
+
+        except Exception as e:
+            raise Exception(
+                f"Invalid file '{file_path}': {e}"
+            )

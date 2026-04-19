@@ -47,8 +47,7 @@ class Evaluator:
             raise Exception("Invalid overlap value")
 
         # Print datas
-        is_valid_data: bool = True
-        print(f"Student data is valid: {is_valid_data}")
+        print("Student data is valid: True")
 
         # Calculate the questions stats
         total_questions: int = len(dataset_answer.rag_questions)
@@ -93,10 +92,10 @@ class Evaluator:
                 if isinstance(dataset_q, AnsweredQuestion):
                     dataset_has_source: bool = len(dataset_q.sources) > 0
 
-                if same_q and dataset_has_source:
-                    evaluated_questions.append(
-                        (student_q, dataset_q)
-                    )
+                    if same_q and dataset_has_source:
+                        evaluated_questions.append(
+                            (student_q, dataset_q)
+                        )
 
         print(f"Questions evaluated: {len(evaluated_questions)}")
 

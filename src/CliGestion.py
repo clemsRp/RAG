@@ -6,6 +6,7 @@ import bm25s
 # External imports
 from typing import Any
 from pathlib import Path
+from pydantic import ValidationError
 
 # Project imports
 from src.Chunker import Chunker
@@ -255,19 +256,29 @@ class CliGestion:
         overlaps: list[int] = [1, 3, 5, 10]
         max_context_length = min([max_context_length, 2000])
 
-        # Get the student answer
-        student_answer: StudentSearchResultsAndAnswer = (
-            parser.get_student_search_results_and_answer(
-                student_answer_path
+        try:
+            # Get the student answer
+            student_answer: StudentSearchResultsAndAnswer = (
+                parser.get_student_search_results_and_answer(
+                    student_answer_path
+                )
             )
-        )
 
-        # Get the dataset answer
-        dataset_answer: RagDataset = (
-            parser.get_rag_dataset(
-                dataset_path
+        except ValidationError:
+            print("Student data is valid: False")
+            return
+
+        try:
+            # Get the dataset answer
+            dataset_answer: RagDataset = (
+                parser.get_rag_dataset(
+                    dataset_path
+                )
             )
-        )
+
+        except ValidationError:
+            print("Dataset is valid: False")
+            return
 
         # Print the evaluation results
         evaluater.print_evaluation_results(
