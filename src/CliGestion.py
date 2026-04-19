@@ -19,7 +19,7 @@ from src.core.Evaluator import Evaluator
 from src.DataModels import (
     MinimalSource, UnansweredQuestion, AnsweredQuestion,
     StudentSearchResults, StudentSearchResultsAndAnswer,
-    RagDataset, BM25_OUTPUT_PATH
+    RagDataset, BM25_OUTPUT_PATH, LLM_MODEL
 )
 
 
@@ -166,7 +166,7 @@ class CliGestion:
         )
 
         # Answer the question
-        answerer: Answerer = Answerer()
+        answerer: Answerer = Answerer(LLM_MODEL)
         student_search_results_and_answer: StudentSearchResultsAndAnswer = (
             answerer.answer(student_search_results)
         )
@@ -200,7 +200,7 @@ class CliGestion:
         )
 
         # Answer the question
-        answerer: Answerer = Answerer()
+        answerer: Answerer = Answerer(LLM_MODEL)
         student_search_results_and_answer: StudentSearchResultsAndAnswer = (
             answerer.answer(student_search_results)
         )
