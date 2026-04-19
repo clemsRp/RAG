@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Handle import error modifying the pyproject.toml
+from tqdm import tqdm
+
 import ast
 from pathlib import Path
 from typing import Any
@@ -38,7 +41,7 @@ class Chunker:
         files: list[Path] = self._get_files()
         res: list[tuple[str, MinimalSource]] = []
 
-        for file in files:
+        for file in tqdm(files):
             # Get the content of the file
             content: str = self._get_content(file)
 

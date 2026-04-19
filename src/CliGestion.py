@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-# External imports
+# Handle import error modifying the pyproject.toml
 import bm25s
+
+# External imports
 from typing import Any
 from pathlib import Path
 

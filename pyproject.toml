@@ -10,11 +10,13 @@ dependencies = [
     "flake8>=7.3.0",
     "mypy>=1.20.0",
     "pydantic>=2.13.0",
+    "tqdm>=4.67.3",
 ]
 
 [[tool.mypy.overrides]]
 module = [
     "bm25s.*",
-    "fire.*"
+    "fire.*",
+    "tqdm.*"
 ]
 ignore_missing_imports = true

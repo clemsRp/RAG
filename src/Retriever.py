@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-# Handle import error modifying the pyproject.toml
+# Handle import errors modifying the pyproject.toml
 import bm25s
+from tqdm import tqdm
+
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
     MinimalSearchResults, StudentSearchResults,
@@ -43,26 +45,59 @@ class Retriever:
         '''
         search_results: list[MinimalSearchResults] = []
 
-        for question in questions:
+        # Handle the tqdm progress bars
+        if len(questions) > 1:
+            for question in tqdm(questions):
+                self._question_pipeline(
+                    search_results,
+                    question,
+                    k
+                )
 
-            # Tokenize the question
-            query_tokens = bm25s.tokenize([question.question])
-
-            # Get the k best results
-            retriever = bm25s.BM25.load(
-                BM25_OUTPUT_PATH,
-                load_corpus=True
-            )
-            results: list[dict[str, str | int]] = (
-                retriever.retrieve(query_tokens, k=k)[0][0]
-            )
-
-            search_results.append(self._convert_results(question, results))
+        else:
+            for question in questions:
+                self._question_pipeline(
+                    search_results,
+                    question,
+                    k
+                )
 
         return StudentSearchResults(
             search_results=search_results,
             k=k
         )
+
+    def _question_pipeline(
+                self,
+                search_results: list[MinimalSearchResults],
+                question: UnansweredQuestion,
+                k: int = 10
+            ) -> None:
+        '''
+        Execute a pipeline on a question
+
+        Args:
+            search_results: list[MinimalSearchResults] =
+                The list of the retrieved sources
+            question: UnansweredQuestion =
+                The question to execute the pipeline on
+            k: int = The number of search to retrieve
+        Return:
+            None
+        '''
+        # Tokenize the question
+        query_tokens = bm25s.tokenize([question.question])
+
+        # Get the k best results
+        retriever = bm25s.BM25.load(
+            BM25_OUTPUT_PATH,
+            load_corpus=True
+        )
+        results: list[dict[str, str | int]] = (
+            retriever.retrieve(query_tokens, k=k)[0][0]
+        )
+
+        search_results.append(self._convert_results(question, results))
 
     def _convert_results(
                 self,

@@ -1,4 +1,3 @@
 - Adapt evaluator state -> no hardcode
 - Understand and do the k/max_content_length of the evaluation flag
-- Implement tqdm progress bars
 - Implement the answer generation system
