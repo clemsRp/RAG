@@ -2,7 +2,6 @@
 
 # External imports
 import bm25s
-import json
 from typing import Any
 from pathlib import Path
 
@@ -15,7 +14,7 @@ from src.Evaluator import Evaluator
 
 # Project DataModels imports
 from src.DataModels import (
-    MinimalSource, UnansweredQuestion,
+    MinimalSource, UnansweredQuestion, AnsweredQuestion,
     StudentSearchResults, StudentSearchResultsAndAnswer,
     RagDataset, BM25_OUTPUT_PATH
 )
@@ -115,7 +114,9 @@ class CliGestion:
             parser.get_rag_dataset(dataset_path)
         )
 
-        prompts: list[dict[str, str]] = dataset.rag_questions
+        prompts: list[
+            AnsweredQuestion | UnansweredQuestion
+        ] = dataset.rag_questions
 
         questions: list[UnansweredQuestion] = [
             UnansweredQuestion(
@@ -164,7 +165,7 @@ class CliGestion:
         # Answer the question
         answerer: Answerer = Answerer()
         student_search_results_and_answer: StudentSearchResultsAndAnswer = (
-            answerer.answer(student_search_results, k)
+            answerer.answer(student_search_results)
         )
 
         # Print the results
@@ -177,8 +178,7 @@ class CliGestion:
                 ),
                 save_directory: str = (
                     "data/output/search_results_and_answer"
-                ),
-                k: int = 10
+                )
             ) -> None:
         '''
         Handle the answer_dataset flag

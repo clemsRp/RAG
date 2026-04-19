@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Handle import error modifying the pyproject.toml
 import bm25s
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
@@ -72,6 +73,8 @@ class Retriever:
         Return the prompt results converted in MinimalSearchResults
 
         Args:
+            question: UnansweredQuestion =
+                The question to retrieved the sources
             results: list[dict[str, str | int]] =
                 The retrieved datas/sources
         Return:

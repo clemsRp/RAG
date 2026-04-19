@@ -50,7 +50,7 @@ class Parser:
         )
 
         return student_search_results
-    
+
     def get_student_search_results_and_answer(
                     self,
                     student_search_results_and_answer_path: str
@@ -102,7 +102,7 @@ class Parser:
         )
 
         return rag_dataset
-    
+
     def _get_dataset(self, file_path: str) -> dict[str, Any]:
         '''
         Return the dataset of a given file_path

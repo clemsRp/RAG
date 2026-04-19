@@ -3,6 +3,7 @@
 from src.DataModels import (
     StudentSearchResults,
     MinimalAnswer,
+    MinimalSearchResults,
     StudentSearchResultsAndAnswer
 )
 
@@ -33,7 +34,6 @@ class Answerer:
         Args:
             student_search_results: StudentSearchResults =
                 The retrieved sources and the questions
-            k: int = The number of search to retrieve
         Return:
             res: StudentSearchResultsAndAnswer =
                 The search_results that contains the answers
@@ -58,12 +58,12 @@ class Answerer:
             k=student_search_results.k
         )
 
-    def _get_answer(self, result: StudentSearchResults) -> str:
+    def _get_answer(self, result: MinimalSearchResults) -> str:
         '''
         Return the answer of the given question
 
         Args:
-            result: StudentSearchResults = The question datas
+            result: MinimalSearchResults = The question datas
         Return:
             answer: str = The answer of the question
         '''

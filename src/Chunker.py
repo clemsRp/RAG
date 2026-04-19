@@ -3,7 +3,7 @@
 import ast
 from pathlib import Path
 from typing import Any
-from src.DataModels import MinimalSource
+from src.DataModels import MinimalSource, VLLM_FOLDER
 
 
 class Chunker:
@@ -82,7 +82,7 @@ class Chunker:
         res: list[Path] = []
 
         # Init of the starting folder and the stack of folder
-        folder: Path = Path("./vllm-0.10.1/")
+        folder: Path = Path(VLLM_FOLDER)
         folder_stack: list[Path] = [folder]
 
         # Iter on the root folder with recurcion
@@ -233,14 +233,16 @@ class Chunker:
         return res
 
     def _get_node_span(
-                self, content: str, node: Any
+                self,
+                content: str,
+                node: Any
             ) -> tuple[int, int]:
         '''
         Return the start and the end index of the chunk
 
         Args:
             content: str = The content of the file to chunk
-            node: ast.AST = The node containing the chunk
+            node: Any = The node containing the chunk
         Return:
             res: tuple[int, int] = The start and end index of the chunk
         '''
@@ -278,11 +280,15 @@ class Chunker:
         cursor: int = 0
 
         state: bool = True
+        # While there is characters left
         while state:
+
+            # We check if we are at the end of the global chunk
             if cursor >= len(global_chunk_content):
                 cursor = len(global_chunk_content) - 1
                 state = False
 
+            # We add a sub-chunk
             chunk: str = global_chunk_content[cursor:cursor + max_chunk_size]
             start: int = global_start + cursor
             end: int = start + len(chunk)

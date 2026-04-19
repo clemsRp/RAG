@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import uuid
+from typing import Sequence
 from pydantic import BaseModel, Field
 
-
+VLLM_FOLDER: str = "./data/raw/vllm-0.10.1/"
 BM25_OUTPUT_PATH: str = "data/processed/bm25_index"
 
 
@@ -99,13 +100,13 @@ class StudentSearchResults(BaseModel):
     Manage the student search results
 
     Args:
-        search_results: list[MinimalSearchResults] =
+        search_results: Sequence[MinimalSearchResults] =
             The student search results
         k: int = The number of results requested
     Return:
         None
     '''
-    search_results: list[MinimalSearchResults]
+    search_results: Sequence[MinimalSearchResults]
     k: int
 
 
@@ -114,10 +115,9 @@ class StudentSearchResultsAndAnswer(StudentSearchResults):
     Manage the student search results and answers
 
     Args:
-        search_results_and_answer: list[MinimalAnswer] =
+        search_results_and_answer: Sequence[MinimalAnswer] =
             The search results and answers
     Return:
         None
     '''
-    search_results: list[MinimalAnswer]
-    k: int
+    search_results: Sequence[MinimalAnswer]

@@ -11,3 +11,10 @@ dependencies = [
     "mypy>=1.20.0",
     "pydantic>=2.13.0",
 ]
+
+[[tool.mypy.overrides]]
+module = [
+    "bm25s.*",
+    "fire.*"
+]
+ignore_missing_imports = true
