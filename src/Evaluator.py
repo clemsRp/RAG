@@ -65,7 +65,6 @@ class Evaluator:
             f"student sources: {sourced_student_questions}\n"
         )
 
-        # Print Recall
         print(
             "Evaluation Results\n"
             "========================================"
@@ -140,7 +139,7 @@ class Evaluator:
                             ):
 
                         # We update the number of good student sources
-                        correcte_questions += 1
+                        correcte_questions += 1.0
 
                         # And redo it with the next dataset_source
                         break
