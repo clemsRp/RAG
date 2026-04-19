@@ -9,11 +9,11 @@ from pathlib import Path
 from pydantic import ValidationError
 
 # Project imports
-from src.Chunker import Chunker
-from src.Retriever import Retriever
-from src.Parser import Parser
-from src.Answerer import Answerer
-from src.Evaluator import Evaluator
+from src.core.Chunker import Chunker
+from src.core.Retriever import Retriever
+from src.core.Parser import Parser
+from src.core.Answerer import Answerer
+from src.core.Evaluator import Evaluator
 
 # Project DataModels imports
 from src.DataModels import (

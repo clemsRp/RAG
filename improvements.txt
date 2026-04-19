@@ -1,3 +1,2 @@
-- Adapt evaluator state -> no hardcode
 - Understand and do the k/max_content_length of the evaluation flag
 - Implement the answer generation system
