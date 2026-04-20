@@ -30,7 +30,8 @@ class Retriever:
     def retrieve(
                 self,
                 questions: list[UnansweredQuestion],
-                k: int
+                k: int,
+                is_dataset: bool = True
             ) -> StudentSearchResults:
         '''
         Retrieve the datas for a given list of questions
@@ -46,7 +47,7 @@ class Retriever:
         search_results: list[MinimalSearchResults] = []
 
         # Handle the tqdm progress bars
-        if len(questions) > 1:
+        if is_dataset:
             for question in tqdm(questions):
                 self._question_pipeline(
                     search_results,

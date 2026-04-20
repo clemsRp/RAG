@@ -86,7 +86,7 @@ class CliGestion:
         # Get the retrieved datas
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
-            retriever.retrieve(questions, k)
+            retriever.retrieve(questions, k, is_dataset=False)
         )
 
         # Print the results
@@ -162,13 +162,13 @@ class CliGestion:
         # Get the retrieved datas
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
-            retriever.retrieve(questions, k)
+            retriever.retrieve(questions, k, is_dataset=False)
         )
 
         # Answer the question
         answerer: Answerer = Answerer(LLM_MODEL)
         student_search_results_and_answer: StudentSearchResultsAndAnswer = (
-            answerer.answer(student_search_results)
+            answerer.answer(student_search_results, is_dataset=False)
         )
 
         # Print the results

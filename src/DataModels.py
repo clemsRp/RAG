@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 VLLM_FOLDER: str = "./data/raw/vllm-0.10.1/"
 BM25_OUTPUT_PATH: str = "data/processed/bm25_index"
-LLM_MODEL: str = "Qwen/Qwen2.5-0.5B-Instruct"
+LLM_MODEL: str = "qwen"
 
 
 class MinimalSource(BaseModel):

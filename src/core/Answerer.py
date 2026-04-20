@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # Handle import error modifying the pyproject.toml
+import ollama
 from tqdm import tqdm
-from transformers import pipeline
 
 
 from src.DataModels import (
@@ -28,16 +28,12 @@ class Answerer:
         Return:
             None
         '''
-        self.generator = pipeline(
-            "text-generation",
-            model=model,
-            dtype="auto",
-            device_map="auto"
-        )
+        self.model: str = model
 
     def answer(
                 self,
-                student_search_results: StudentSearchResults
+                student_search_results: StudentSearchResults,
+                is_dataset: bool = True
             ) -> StudentSearchResultsAndAnswer:
         '''
         Answer the given questions
@@ -52,7 +48,7 @@ class Answerer:
         search_results: list[MinimalAnswer] = []
 
         # Handle the tqdm progress bars
-        if len(student_search_results.search_results) > 1:
+        if is_dataset:
             for result in tqdm(student_search_results.search_results):
                 self._answer_pipeline(
                     search_results,
@@ -117,26 +113,23 @@ class Answerer:
 
         llm_sources: str = "\n---\n".join(all_sources)
 
-        # Format the message
-        messages = [
+        prompt = f"""ONLY use this sources to answer the question
+        Sources :
+        {llm_sources}
+
+        Question : {result.question}"""
+
+        # 3. Appel au modèle (ex: qwen, le modèle par défaut du projet [3])
+        response = ollama.chat(model=self.model, messages=[
             {
-                "role": "system",
-                "content": f"Answer using this: '{llm_sources}'"
+                'role': 'user',
+                'content': prompt,
             },
-            {
-                "role": "user",
-                "content": result.question
-            }
-        ]
+        ])
 
-        # Get the answer
-        outputs = self.generator(
-            messages,
-            max_new_tokens=128,
-            do_sample=False
-        )
+        print(f"\n\n\n{response['message']}\n\n\n")
 
-        return str(outputs[0]['generated_text'][-1]['content'])
+        return str(response['message']['content'])
 
     def _get_source_text(
                 self,
