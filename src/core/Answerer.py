@@ -10,7 +10,8 @@ from src.DataModels import (
     MinimalSource,
     MinimalAnswer,
     MinimalSearchResults,
-    StudentSearchResultsAndAnswer
+    StudentSearchResultsAndAnswer,
+    HOST
 )
 
 
@@ -29,6 +30,11 @@ class Answerer:
             None
         '''
         self.model: str = model
+
+        self.client: ollama.Client = ollama.Client(
+            HOST,
+            timeout=30.0
+        )
 
     def answer(
                 self,
@@ -106,30 +112,28 @@ class Answerer:
         '''
         # Get all the student sources in one str
         all_sources: list[str] = []
-        for source in result.retrieved_sources:
+        for i in range(min([len(result.retrieved_sources), 3])):
+            source = result.retrieved_sources[i]
             all_sources.append(
                 self._get_source_text(source)
             )
 
-        llm_sources: str = "\n---\n".join(all_sources)
+        llm_sources: str = "\n---\n".join(all_sources)[:500]
 
-        prompt = f"""ONLY use this sources to answer the question
+        context = f"""ONLY use this sources to answer the question
         Sources :
-        {llm_sources}
+        {llm_sources}"""
 
-        Question : {result.question}"""
+        response = self.client.generate(
+            model=self.model,
+            prompt=result.question,
+            system=context,
+            options={
+                "temperature": 0.1
+            }
+        )
 
-        # 3. Appel au modèle (ex: qwen, le modèle par défaut du projet [3])
-        response = ollama.chat(model=self.model, messages=[
-            {
-                'role': 'user',
-                'content': prompt,
-            },
-        ])
-
-        print(f"\n\n\n{response['message']}\n\n\n")
-
-        return str(response['message']['content'])
+        return str(response['response'])
 
     def _get_source_text(
                 self,
