@@ -2,9 +2,15 @@
 NAME = src
 EXEC = python3
 DEBUGER = pdb
+OLLAMA_FOLDER = ~/ollama_models
 
 install:
 	uv sync
+
+start:
+	mkdir -p $(OLLAMA_FOLDER)
+	export OLLAMA_MODELS=$(OLLAMA_FOLDER)
+	ollama serve
 
 run:
 	uv run $(EXEC) -m $(NAME)
@@ -33,4 +39,4 @@ clean:
 	rm -rf *.pyc
 	rm -rf .venv .python-version main.py
 
-.PHONY: install run debug lint lint-strict clean
+.PHONY: install start run debug lint lint-strict clean
