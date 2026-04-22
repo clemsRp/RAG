@@ -93,8 +93,11 @@ class Retriever:
         Return:
             None
         '''
+        # Modify the question
+        modified_question: str = self._get_modified_question(question.question)
+
         # Tokenize the question
-        query_tokens = bm25s.tokenize([question.question])
+        query_tokens = bm25s.tokenize([modified_question])
 
         all_results: list[dict[str, str | int]] = []
         all_scores: list[float] = []
@@ -126,6 +129,17 @@ class Retriever:
         ]
 
         search_results.append(self._convert_results(question, results))
+
+    def _get_modified_question(self, question: str) -> str:
+        '''
+        Return the modified question
+
+        Args:
+            question: str = The question to modify
+        Return:
+            None
+        '''
+        return question
 
     def _convert_results(
                 self,
