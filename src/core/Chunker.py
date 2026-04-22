@@ -200,7 +200,9 @@ class Chunker:
                         ast.Import, ast.ImportFrom
                     )):
                 # Get the start and end index of the chunk
-                node_span: tuple[int, int] = self._get_node_span(content, node)
+                node_span: tuple[int, int] = self._get_node_span(
+                    content, node, len(content) - 1
+                )
                 start_index: int = node_span[0]
                 end_index: int = node_span[1]
 
@@ -219,7 +221,8 @@ class Chunker:
                     # Split the chunk to get correct sized chunks
                     sub_chunks = self._split_large_text(
                         content[start_index:end_index],
-                        start_index, max_chunk_size
+                        start_index, max_chunk_size,
+                        len(content) - 1
                     )
 
                     # Add the chunks to the result
@@ -238,7 +241,8 @@ class Chunker:
     def _get_node_span(
                 self,
                 content: str,
-                node: Any
+                node: Any,
+                file_last_character_index: int
             ) -> tuple[int, int]:
         '''
         Return the start and the end index of the chunk
@@ -246,6 +250,8 @@ class Chunker:
         Args:
             content: str = The content of the file to chunk
             node: Any = The node containing the chunk
+            file_last_character_index: int =
+                The index of the last character of the file
         Return:
             res: tuple[int, int] = The start and end index of the chunk
         '''
@@ -261,13 +267,17 @@ class Chunker:
             len(line) for line in lines[:node.end_lineno - 1]
         ]) + node.end_col_offset
 
+        if end > file_last_character_index:
+            end = file_last_character_index
+
         return start, end
 
     def _split_large_text(
                 self,
                 global_chunk_content: str,
                 global_start: int,
-                max_chunk_size: int
+                max_chunk_size: int,
+                file_last_character_index: int
             ) -> list[tuple[str, int, int]]:
         '''
         Split the chunk according to the max_chunk_size
@@ -276,6 +286,8 @@ class Chunker:
             global_chunk_content: str = The chunk's content
             global_start: int = The start of the 'current' chunk
             max_chunk_size: int = The max size of the chunk
+            file_last_character_index: int =
+                The index of the last character of the file
         Return:
             res: list[tuple[str, int, int]] = The list of the chunks's datas
         '''
@@ -289,6 +301,8 @@ class Chunker:
 
             start: int = global_start + cursor
             end: int = start + len(chunk) - 1
+            if end > file_last_character_index:
+                end = file_last_character_index
 
             sub_chunks.append((chunk, start, end))
 

@@ -33,7 +33,7 @@ class Answerer:
 
         self.client: ollama.Client = ollama.Client(
             HOST,
-            timeout=30.0
+            timeout=120.0
         )
 
     def answer(
@@ -163,7 +163,8 @@ class Answerer:
                     raise Exception(
                         "Invalid source, invalid last_character_index "
                         f"({source.last_character_index}), "
-                        f"source: (0-{len(content) - 1})"
+                        f"source: (0-{len(content) - 1}) "
+                        f"in '{source.file_path}'"
                     )
 
                 return content[

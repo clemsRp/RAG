@@ -4,11 +4,22 @@
 import bm25s
 from tqdm import tqdm
 
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords, wordnet
+
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
     MinimalSearchResults, StudentSearchResults,
     BM25_OUTPUT_PATH
 )
+
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+MAX_SYNONYMS: int = 2
 
 
 class Retriever:
@@ -140,6 +151,39 @@ class Retriever:
             None
         '''
         return question
+        # Tokenize the question
+        words = word_tokenize(question)
+
+        # Get the non important words
+        stop_words = set(stopwords.words('english'))
+        filtered_words = [
+            w for w in words if w.lower() not in stop_words and w.isalnum()
+        ]
+
+        modified_question: list[str] = filtered_words[:]
+
+        # Get synonyms
+        for word in filtered_words:
+            modified_question += self._get_synonyms(word, MAX_SYNONYMS)
+
+        return " ".join(modified_question)
+
+    def _get_synonyms(self, word: str, max_synonyms: int) -> list[str]:
+        '''
+        Return the synonyms of a given word
+
+        Args:
+            word: str = The word to get the synonyms
+            max_synonyms: int = The max number of synonyms to add
+        Return
+            synonyms: list[str] = The list of the synonyms
+        '''
+        synonyms = set()
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                synonyms.add(lemma.name())
+
+        return list(synonyms)
 
     def _convert_results(
                 self,
