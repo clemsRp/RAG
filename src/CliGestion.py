@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
-# Handle import error modifying the pyproject.toml
-import bm25s
-
 # External imports
-from typing import Any
 from pathlib import Path
 from pydantic import ValidationError
 
 # Project imports
 from src.core.Chunker import Chunker
+from src.core.Indexer import Indexer
 from src.core.Retriever import Retriever
 from src.core.Parser import Parser
 from src.core.Answerer import Answerer
@@ -19,7 +16,7 @@ from src.core.Evaluator import Evaluator
 from src.DataModels import (
     MinimalSource, UnansweredQuestion, AnsweredQuestion,
     StudentSearchResults, StudentSearchResultsAndAnswer,
-    RagDataset, BM25_OUTPUT_PATH, LLM_MODEL
+    RagDataset, LLM_MODEL, CODE_PATH, DOCS_PATH
 )
 
 
@@ -46,23 +43,22 @@ class CliGestion:
             chunker.chunk_files(max_chunk_size)
         )
 
-        # Get the content and the datas about the chunks
-        texts: list[str] = [
-            chunk[0] for chunk in chunks
+        # Index the .py and .md
+        indexer: Indexer = Indexer()
+
+        # Filter chunks in code and docs
+        docs_chunks: list[tuple[str, MinimalSource]] = [
+            chunk for chunk in chunks
+            if Path(chunk[1].file_path).suffix == ".md"
         ]
-        sources: list[dict[str, Any]] = [
-            chunk[1].model_dump() for chunk in chunks
+        code_chunks: list[tuple[str, MinimalSource]] = [
+            chunk for chunk in chunks
+            if Path(chunk[1].file_path).suffix == ".py"
         ]
 
-        # Tokenize the contents
-        corpus_tokens = bm25s.tokenize(texts)
-
-        # Link the contents with the datas
-        retriever = bm25s.BM25(corpus=sources)
-        retriever.index(corpus_tokens)
-
-        # Save the datas
-        retriever.save(BM25_OUTPUT_PATH, corpus=sources)
+        # Save the chunks
+        indexer.index(docs_chunks, "docs")
+        indexer.index(code_chunks, "code")
 
         print("Ingestion complete! Indices saved under data/processed/")
 
@@ -83,10 +79,12 @@ class CliGestion:
             )
         ]
 
+        sub_directories: list[str] = [CODE_PATH, DOCS_PATH]
+
         # Get the retrieved datas
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
-            retriever.retrieve(questions, k, is_dataset=False)
+            retriever.retrieve(questions, sub_directories, k, is_dataset=False)
         )
 
         # Print the results
@@ -128,10 +126,16 @@ class CliGestion:
             ) for prompt in prompts
         ]
 
+        sub_directories: list[str] = []
+        if "docs" in dataset_path:
+            sub_directories.append(DOCS_PATH)
+        if "code" in dataset_path:
+            sub_directories.append(CODE_PATH)
+
         # Get the retrieved datas (getting the prompts in the retriever)
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
-            retriever.retrieve(questions, k)
+            retriever.retrieve(questions, sub_directories, k)
         )
 
         # Save the results
@@ -159,10 +163,12 @@ class CliGestion:
             )
         ]
 
+        sub_directories: list[str] = [CODE_PATH, DOCS_PATH]
+
         # Get the retrieved datas
         retriever: Retriever = Retriever()
         student_search_results: StudentSearchResults = (
-            retriever.retrieve(questions, k, is_dataset=False)
+            retriever.retrieve(questions, sub_directories, k, is_dataset=False)
         )
 
         # Answer the question

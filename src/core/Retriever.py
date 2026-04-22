@@ -30,6 +30,7 @@ class Retriever:
     def retrieve(
                 self,
                 questions: list[UnansweredQuestion],
+                sub_directories: list[str],
                 k: int,
                 is_dataset: bool = True
             ) -> StudentSearchResults:
@@ -39,7 +40,9 @@ class Retriever:
         Args:
             questions: list[UnansweredQuestion] =
                 The list of prompt to retrieve datas
+            sub_directories: str = The sub directories to get the datas
             k: int = The number of search to retrieve
+            is_dataset: bool = True if we need to save the results
         Return:
             res: list[MinimalSearchResults] =
                 The list of the datas of each questions
@@ -52,6 +55,7 @@ class Retriever:
                 self._question_pipeline(
                     search_results,
                     question,
+                    sub_directories,
                     k
                 )
 
@@ -60,6 +64,7 @@ class Retriever:
                 self._question_pipeline(
                     search_results,
                     question,
+                    sub_directories,
                     k
                 )
 
@@ -72,6 +77,7 @@ class Retriever:
                 self,
                 search_results: list[MinimalSearchResults],
                 question: UnansweredQuestion,
+                sub_directories: list[str],
                 k: int = 10
             ) -> None:
         '''
@@ -82,6 +88,7 @@ class Retriever:
                 The list of the retrieved sources
             question: UnansweredQuestion =
                 The question to execute the pipeline on
+            sub_directories: str = The sub directories to get the datas
             k: int = The number of search to retrieve
         Return:
             None
@@ -89,14 +96,34 @@ class Retriever:
         # Tokenize the question
         query_tokens = bm25s.tokenize([question.question])
 
-        # Get the k best results
-        retriever = bm25s.BM25.load(
-            BM25_OUTPUT_PATH,
-            load_corpus=True
-        )
-        results: list[dict[str, str | int]] = (
-            retriever.retrieve(query_tokens, k=k)[0][0]
-        )
+        all_results: list[dict[str, str | int]] = []
+        all_scores: list[float] = []
+
+        # Get all the results
+        for sub_directory in sub_directories:
+
+            # Get the k best results
+            retriever = bm25s.BM25.load(
+                BM25_OUTPUT_PATH + sub_directory,
+                load_corpus=True
+            )
+            result = retriever.retrieve(
+                query_tokens, k=k
+            )
+
+            all_results.extend(result[0][0])
+            all_scores.extend(result[1][0])
+
+        # Filter the results
+        all_datas: list[tuple[float, dict[str, str | int]]] = [
+            (all_scores[i], all_results[i])
+            for i in range(len(all_results))
+        ]
+        all_datas.sort(key=lambda data: data[0], reverse=True)
+
+        results: list[dict[str, str | int]] = [
+            all_datas[j][1] for j in range(min([k, len(all_datas)]))
+        ]
 
         search_results.append(self._convert_results(question, results))
 
