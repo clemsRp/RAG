@@ -33,7 +33,7 @@ class Answerer:
 
         self.client: ollama.Client = ollama.Client(
             HOST,
-            timeout=120.0
+            timeout=20.0
         )
 
     def answer(

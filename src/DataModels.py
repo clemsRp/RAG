@@ -10,6 +10,7 @@ CODE_PATH: str = "code/"
 DOCS_PATH: str = "docs/"
 LLM_MODEL: str = "qwen"
 HOST: str = "http://localhost:11434"
+QUERY_SEMANTIC: str = True
 
 
 class MinimalSource(BaseModel):

@@ -11,7 +11,7 @@ from nltk.corpus import stopwords, wordnet
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
     MinimalSearchResults, StudentSearchResults,
-    BM25_OUTPUT_PATH
+    BM25_OUTPUT_PATH, QUERY_SEMANTIC
 )
 
 nltk.download('punkt')
@@ -104,11 +104,14 @@ class Retriever:
         Return:
             None
         '''
+        final_question: str = question.question
+
         # Modify the question
-        modified_question: str = self._get_modified_question(question.question)
+        if QUERY_SEMANTIC:
+            final_question = self._get_modified_question(question.question)
 
         # Tokenize the question
-        query_tokens = bm25s.tokenize([modified_question])
+        query_tokens = bm25s.tokenize([final_question])
 
         all_results: list[dict[str, str | int]] = []
         all_scores: list[float] = []
@@ -150,7 +153,6 @@ class Retriever:
         Return:
             None
         '''
-        return question
         # Tokenize the question
         words = word_tokenize(question)
 
@@ -160,13 +162,13 @@ class Retriever:
             w for w in words if w.lower() not in stop_words and w.isalnum()
         ]
 
-        modified_question: list[str] = filtered_words[:]
+        modified_question: list[str] = []
 
         # Get synonyms
         for word in filtered_words:
             modified_question += self._get_synonyms(word, MAX_SYNONYMS)
 
-        return " ".join(modified_question)
+        return question + " ".join(modified_question)
 
     def _get_synonyms(self, word: str, max_synonyms: int) -> list[str]:
         '''
