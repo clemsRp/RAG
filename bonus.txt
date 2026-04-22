@@ -1,0 +1,3 @@
+- 2 index
+- 2 type de chunker
+- high performance

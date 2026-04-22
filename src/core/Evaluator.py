@@ -119,12 +119,16 @@ class Evaluator:
 
         # Calculate and print the Recall@k scores
         for overlap in overlaps:
-            score: float = self._get_score(
-                evaluated_questions,
-                overlap,
-                k
-            ) / len(evaluated_questions) * 100
-            print(f"Recall@{overlap}: {score:.3f}")
+            if len(evaluated_questions) != 0:
+                score: float = self._get_score(
+                    evaluated_questions,
+                    overlap,
+                    k
+                ) / len(evaluated_questions) * 100
+                print(f"Recall@{overlap}: {score:.3f}")
+
+            else:
+                print(f"Recall@{overlap}: {0.0:.3f}")
 
     def _get_score(
                 self,
