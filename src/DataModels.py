@@ -4,14 +4,6 @@ import uuid
 from typing import Sequence
 from pydantic import BaseModel, Field
 
-VLLM_FOLDER: str = "./data/raw/vllm-0.10.1/"
-BM25_OUTPUT_PATH: str = "data/processed/bm25_index/"
-CODE_PATH: str = "code/"
-DOCS_PATH: str = "docs/"
-LLM_MODEL: str = "qwen"
-HOST: str = "http://localhost:11434"
-QUERY_SEMANTIC: str = True
-
 
 class MinimalSource(BaseModel):
     '''

@@ -4,9 +4,9 @@ import bm25s
 from typing import Any
 
 from src.DataModels import (
-    MinimalSource,
-    BM25_OUTPUT_PATH
+    MinimalSource
 )
+from src.Constants import BM25_OUTPUT_PATH
 
 
 class Indexer:

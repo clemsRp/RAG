@@ -10,9 +10,9 @@ from nltk.corpus import stopwords, wordnet
 
 from src.DataModels import (
     MinimalSource, UnansweredQuestion,
-    MinimalSearchResults, StudentSearchResults,
-    BM25_OUTPUT_PATH, QUERY_SEMANTIC
+    MinimalSearchResults, StudentSearchResults
 )
+from src.Constants import BM25_OUTPUT_PATH, QUERY_SEMANTIC
 
 nltk.download('punkt')
 nltk.download('punkt_tab')

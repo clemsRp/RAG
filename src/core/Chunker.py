@@ -6,7 +6,8 @@ from tqdm import tqdm
 import ast
 from pathlib import Path
 from typing import Any
-from src.DataModels import MinimalSource, VLLM_FOLDER
+from src.DataModels import MinimalSource
+from src.Constants import VLLM_FOLDER
 
 
 class Chunker:

@@ -19,6 +19,7 @@ dependencies = [
 module = [
     "bm25s.*",
     "fire.*",
-    "tqdm.*"
+    "tqdm.*",
+    "nltk.*"
 ]
 ignore_missing_imports = true

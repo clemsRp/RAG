@@ -16,8 +16,9 @@ from src.core.Evaluator import Evaluator
 from src.DataModels import (
     MinimalSource, UnansweredQuestion, AnsweredQuestion,
     StudentSearchResults, StudentSearchResultsAndAnswer,
-    RagDataset, LLM_MODEL, CODE_PATH, DOCS_PATH
+    RagDataset
 )
+from src.Constants import LLM_MODEL, CODE_PATH, DOCS_PATH
 
 
 class CliGestion:

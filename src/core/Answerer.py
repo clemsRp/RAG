@@ -10,9 +10,9 @@ from src.DataModels import (
     MinimalSource,
     MinimalAnswer,
     MinimalSearchResults,
-    StudentSearchResultsAndAnswer,
-    HOST
+    StudentSearchResultsAndAnswer
 )
+from src.Constants import HOST
 
 
 class Answerer:
@@ -33,7 +33,7 @@ class Answerer:
 
         self.client: ollama.Client = ollama.Client(
             HOST,
-            timeout=20.0
+            timeout=120.0
         )
 
     def answer(
