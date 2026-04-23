@@ -1,5 +1,4 @@
 - Query expansion
 - 2 index
-- 2 type de chunker
 - high performance
 - AST tree chunking method

@@ -260,7 +260,10 @@ class CliGestion:
         # Initialize the variables
         parser: Parser = Parser()
         evaluater: Evaluator = Evaluator()
-        overlaps: list[int] = [1, 3, 5, 10]
+
+        overlaps: list[int] = [5, 20, 50, 80]
+        nb_sources: list[int] = [1, 3, 5, 10]
+
         max_context_length = min([max_context_length, 2000])
 
         try:
@@ -292,6 +295,7 @@ class CliGestion:
             student_answer,
             dataset_answer,
             overlaps,
+            nb_sources,
             k,
             max_context_length
         )
