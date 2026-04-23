@@ -1,4 +1,4 @@
+- Query expansion
 - 2 index
 - 2 type de chunker
 - high performance
-- Query semantic
