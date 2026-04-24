@@ -7,7 +7,7 @@ import ast
 from pathlib import Path
 from typing import Any
 from src.DataModels import MinimalSource
-from src.Constants import VLLM_FOLDER
+from src.Constants import VLLM_FOLDER, AST
 
 
 class Chunker:
@@ -186,6 +186,28 @@ class Chunker:
             res: list[tuple[str, MinimalSource]] =
                 The classes to stock the chunk datas
         '''
+        if AST:
+            return self._chunk_code_with_ast(file, content, max_chunk_size)
+        else:
+            return self._chunk_code_without_ast(file, content, max_chunk_size)
+
+    def _chunk_code_with_ast(
+                self,
+                file: str,
+                content: str,
+                max_chunk_size: int
+            ) -> list[tuple[str, MinimalSource]]:
+        '''
+        Return the chunked code file using AST
+
+        Args:
+            file: str = The path of the file to chunk
+            content: str = The content of the code file to chunk
+            max_chunk_size: int = The max size of the chunk
+        Return:
+            res: list[tuple[str, MinimalSource]] =
+                The classes to stock the chunk datas
+        '''
         try:
             tree = ast.parse(content)
         except SyntaxError:
@@ -311,3 +333,92 @@ class Chunker:
             cursor += max_chunk_size - 1
 
         return sub_chunks
+
+    def _chunk_code_without_ast(
+                self,
+                file: str,
+                content: str,
+                max_chunk_size: int
+            ) -> list[tuple[str, MinimalSource]]:
+        '''
+        Return the chunked code file not using AST
+
+        Args:
+            file: str = The path of the file to chunk
+            content: str = The content of the code file to chunk
+            max_chunk_size: int = The max size of the chunk
+        Return:
+            res: list[tuple[str, MinimalSource]] =
+                The classes to stock the chunk datas
+        '''
+        # Split into classes
+        if "class " in content:
+            class_chunks: list[str] = content.split("class ")
+            start: int = 1
+            if content[:6] == "class ":
+                start -= 1
+            for k in range(start, len(class_chunks)):
+                class_chunks[k] = "class " + class_chunks[k]
+        else:
+            class_chunks = [content]
+
+        # Split into functions
+        res: list[tuple[str, MinimalSource]] = []
+        chunk_start: int = 0
+
+        for class_chunk in class_chunks:
+            chunk_end: int = chunk_start + len(class_chunk) - 1
+            if len(class_chunk) <= max_chunk_size:
+                res.append((
+                    class_chunk,
+                    MinimalSource(
+                        file_path=file,
+                        first_character_index=chunk_start,
+                        last_character_index=chunk_end
+                    )
+                ))
+
+            elif "def " in class_chunk:
+                func_chunks: list[str] = class_chunk.split("def ")
+                for k in range(1, len(func_chunks)):
+                    func_chunks[k] = "def " + func_chunks[k]
+
+                sub_chunk_start: int = chunk_start
+
+                for func_chunk in func_chunks:
+                    sub_chunk_end: int = sub_chunk_start + len(func_chunk) - 1
+                    if len(func_chunk) <= max_chunk_size:
+                        res.append((
+                            func_chunk,
+                            MinimalSource(
+                                file_path=file,
+                                first_character_index=sub_chunk_start,
+                                last_character_index=sub_chunk_end
+                            )
+                        ))
+
+                    else:
+                        sub_chunks: list[tuple[str, int, int]] = (
+                            self._split_large_text(
+                                func_chunk,
+                                sub_chunk_start,
+                                max_chunk_size,
+                                len(content) - 1
+                            )
+                        )
+
+                        for text, s_start, s_end in sub_chunks:
+                            res.append((
+                                text,
+                                MinimalSource(
+                                    file_path=file,
+                                    first_character_index=s_start,
+                                    last_character_index=s_end
+                                )
+                            ))
+
+                    sub_chunk_start = sub_chunk_end + 1
+
+            chunk_start = chunk_end + 1
+
+        return res

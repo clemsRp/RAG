@@ -10,9 +10,12 @@ HOST: str = "http://localhost:11434"
 
 # Bonus
 
-#  1. Query expansion
+#  1. AST
+AST: bool = False
+
+#  2. Query expansion
 QUERY_SEMANTIC: bool = False
 
-#  2. Hybrid retriaval
+#  3. Hybrid retriaval
 CODE_PATH: str = "code/"
 DOCS_PATH: str = "docs/"

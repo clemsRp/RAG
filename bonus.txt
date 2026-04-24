@@ -1,4 +1,5 @@
-- Query expansion
-- 2 index
+- AST method
+- hybrid retriaval (2 index)
+- query expansion
 - high performance
-- AST tree chunking method
+- multi threading

@@ -1,4 +1,5 @@
 - README.md
+- multi threading
 - Modify the nltk charging system
 - PreCorr
 - Suppr datas file

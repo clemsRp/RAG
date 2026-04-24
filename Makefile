@@ -2,14 +2,13 @@
 NAME = src
 EXEC = python3
 DEBUGER = pdb
-OLLAMA_FOLDER = ~/ollama_models
 
 install:
 	uv sync
 
 start:
-	mkdir -p $(OLLAMA_FOLDER)
-	export OLLAMA_MODELS=$(OLLAMA_FOLDER)
+	mkdir -p ~/ollama_models
+	export OLLAMA_MODELS=~/ollama_models
 	ollama serve
 
 run:
