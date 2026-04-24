@@ -29,7 +29,6 @@ class Evaluator:
                 self,
                 student_answer: StudentSearchResultsAndAnswer,
                 dataset_answer: RagDataset,
-                overlaps: list[int],
                 nb_sources: list[int],
                 max_context_length: int
             ) -> None:
@@ -47,10 +46,6 @@ class Evaluator:
         Return:
             None
         '''
-        # Handle invalid overlaps
-        if any(ov > 100 or ov < 0 for ov in overlaps):
-            raise Exception("Invalid overlap value")
-
         # Check the context_lengths
         is_valid_data: bool = True
         for answer in student_answer.search_results:
@@ -118,14 +113,13 @@ class Evaluator:
         print(f"Questions evaluated: {len(evaluated_questions)}")
 
         # Calculate and print the Recall@k scores
-        for overlap in overlaps:
-            for nb_source in nb_sources:
-                score: float = self._get_score(
-                    evaluated_questions,
-                    overlap,
-                    nb_source
-                ) / len(evaluated_questions) * 100
-                print(f"Recall@{nb_source}: {score:.3f} {overlap}%")
+        for nb_source in nb_sources:
+            score: float = self._get_score(
+                evaluated_questions,
+                5,
+                nb_source
+            ) / len(evaluated_questions) * 100
+            print(f"Recall@{nb_source}: {score:.3f}")
 
     def _get_score(
                 self,

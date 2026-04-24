@@ -261,8 +261,10 @@ class CliGestion:
         parser: Parser = Parser()
         evaluater: Evaluator = Evaluator()
 
-        overlaps: list[int] = [5, 20, 50, 80]
-        nb_sources: list[int] = [1, 3, 5, 10]
+        nb_sources: list[int] = [
+            num for num in [1, 3, 5, 10]
+            if num <= k
+        ]
 
         max_context_length = min([max_context_length, 2000])
 
@@ -294,8 +296,6 @@ class CliGestion:
         evaluater.print_evaluation_results(
             student_answer,
             dataset_answer,
-            overlaps,
             nb_sources,
-            k,
             max_context_length
         )

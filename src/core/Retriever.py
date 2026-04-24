@@ -165,12 +165,14 @@ class Retriever:
         modified_question: list[str] = []
 
         # Get synonyms
-        for word in filtered_words:
-            modified_question += self._get_synonyms(word, MAX_SYNONYMS)
+        for word in words:
+            modified_question += [word]
+            if word in filtered_words:
+                modified_question += self._get_synonyms(word)
 
-        return question + " ".join(modified_question)
+        return " ".join(modified_question)
 
-    def _get_synonyms(self, word: str, max_synonyms: int) -> list[str]:
+    def _get_synonyms(self, word: str) -> list[str]:
         '''
         Return the synonyms of a given word
 
@@ -185,7 +187,7 @@ class Retriever:
             for lemma in syn.lemmas():
                 synonyms.add(lemma.name())
 
-        return list(synonyms)
+        return list(synonyms)[:MAX_SYNONYMS]
 
     def _convert_results(
                 self,
