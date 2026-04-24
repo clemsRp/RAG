@@ -1,4 +1,0 @@
-- README.md
-- Modify the nltk charging system
-- PreCorr
-- Suppr datas file
