@@ -14,10 +14,10 @@ from src.DataModels import (
 )
 from src.Constants import BM25_OUTPUT_PATH, QUERY_SEMANTIC
 
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('stopwords')
-nltk.download('wordnet')
+nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('wordnet', quiet=True)
 
 MAX_SYNONYMS: int = 2
 

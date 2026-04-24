@@ -1,5 +1,0 @@
-- AST method
-- hybrid retriaval (2 index)
-- query expansion
-- high performance
-- multi threading

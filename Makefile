@@ -7,6 +7,7 @@ install:
 	uv sync
 
 start:
+	OLLAMA_NUM_PARALLEL=$(cat /sys/devices/system/cpu/cpu*/topology/core_id | sort -u | wc -l)
 	mkdir -p ~/ollama_models
 	export OLLAMA_MODELS=~/ollama_models
 	ollama serve

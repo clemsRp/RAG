@@ -19,3 +19,6 @@ QUERY_SEMANTIC: bool = False
 #  3. Hybrid retriaval
 CODE_PATH: str = "code/"
 DOCS_PATH: str = "docs/"
+
+#  4. Multi-Threading
+MULTI_THREADING: bool = False

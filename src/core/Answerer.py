@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import concurrent.futures
+
 # Handle import error modifying the pyproject.toml
 import ollama
 from tqdm import tqdm
@@ -12,7 +14,7 @@ from src.DataModels import (
     MinimalSearchResults,
     StudentSearchResultsAndAnswer
 )
-from src.Constants import HOST
+from src.Constants import HOST, MULTI_THREADING
 
 
 class Answerer:
@@ -55,11 +57,34 @@ class Answerer:
 
         # Handle the tqdm progress bars
         if is_dataset:
-            for result in tqdm(student_search_results.search_results):
-                self._answer_pipeline(
-                    search_results,
-                    result
-                )
+
+            # Multi-Threading
+            if MULTI_THREADING:
+                results_to_process = student_search_results.search_results
+
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=3
+                ) as executor:
+                    futures = {
+                        executor.submit(
+                            self._answer_pipeline, search_results, res
+                        ): res
+                        for res in results_to_process
+                    }
+
+                    for future in tqdm(
+                                concurrent.futures.as_completed(futures),
+                                total=len(futures),
+                                desc="Génération des réponses"
+                            ):
+                        future.result()
+
+            else:
+                for result in tqdm(student_search_results.search_results):
+                    self._answer_pipeline(
+                        search_results,
+                        result
+                    )
 
         else:
             for result in student_search_results.search_results:
