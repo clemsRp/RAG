@@ -37,6 +37,10 @@ class CliGestion:
         '''
         # Handle the max_chunk_size
         max_chunk_size = min([max_chunk_size, 2000])
+        if max_chunk_size < 10:
+            raise Exception(
+                "max_chunk_size must be greater or equal to 10"
+            )
 
         # Chunk the files
         chunker: Chunker = Chunker()
@@ -73,6 +77,12 @@ class CliGestion:
         Return
             None
         '''
+        # Handle the k option
+        if k < 1:
+            raise Exception(
+                "k must be greater or equal to 1"
+            )
+
         # Convert the prompt into an UnAnsweredQuestion
         questions: list[UnansweredQuestion] = [
             UnansweredQuestion(
@@ -110,6 +120,12 @@ class CliGestion:
         Return
             None
         '''
+        # Handle the k option
+        if k < 1:
+            raise Exception(
+                "k must be greater or equal to 1"
+            )
+
         # Get the rag_questions
         parser: Parser = Parser()
         dataset: RagDataset = (
@@ -157,6 +173,12 @@ class CliGestion:
         Return
             None
         '''
+        # Handle the k option
+        if k < 1:
+            raise Exception(
+                "k must be greater or equal to 1"
+            )
+
         # Convert the prompt into an UnAnsweredQuestion
         questions: list[UnansweredQuestion] = [
             UnansweredQuestion(
@@ -257,6 +279,18 @@ class CliGestion:
         Return:
             None
         '''
+        # Handle the k option
+        if k < 1:
+            raise Exception(
+                "k must be greater or equal to 1"
+            )
+
+        # Handle the max_content_length
+        if max_context_length < 10:
+            raise Exception(
+                "max_context_length must be greater or equal to 10"
+            )
+
         # Initialize the variables
         parser: Parser = Parser()
         evaluater: Evaluator = Evaluator()

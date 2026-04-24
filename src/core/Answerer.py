@@ -4,6 +4,7 @@ import concurrent.futures
 
 # Handle import error modifying the pyproject.toml
 import ollama
+import httpx
 from tqdm import tqdm
 
 
@@ -33,9 +34,11 @@ class Answerer:
         '''
         self.model: str = model
 
+        ollama.pull(model)
+
         self.client: ollama.Client = ollama.Client(
             HOST,
-            timeout=500.0
+            timeout=15.0
         )
 
     def answer(
@@ -114,9 +117,19 @@ class Answerer:
         Return:
             None
         '''
-        answer: str = self._get_answer(
-            result
-        )
+        try:
+            answer: str = self._get_answer(
+                result,
+                500
+            )
+
+        except httpx.ReadTimeout:
+            print("pionhbiortiojhjiyotjhioyjhiotjhoiyjhno")
+            answer: str = self._get_answer(
+                result,
+                200
+            )
+
         search_results.append(
             MinimalAnswer(
                 question_id=result.question_id,
@@ -126,12 +139,18 @@ class Answerer:
             )
         )
 
-    def _get_answer(self, result: MinimalSearchResults) -> str:
+    def _get_answer(
+                self,
+                result: MinimalSearchResults,
+                num_character: int
+            ) -> str:
         '''
         Return the answer of the given question
 
         Args:
             result: MinimalSearchResults = The question datas
+            num_character: int = The number of character
+                to use from the sources
         Return:
             answer: str = The answer of the question
         '''
@@ -143,7 +162,7 @@ class Answerer:
                 self._get_source_text(source)
             )
 
-        llm_sources: str = "\n---\n".join(all_sources)[:500]
+        llm_sources: str = "\n---\n".join(all_sources)[:num_character]
 
         context = f"""ONLY use this sources to answer the question
         Sources :
