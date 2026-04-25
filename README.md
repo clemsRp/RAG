@@ -37,7 +37,14 @@ To ensure optimal context window usage, the system implements two distinct strat
 The primary retrieval mechanism is **BM25** (via the `bm25s` library), chosen for its high performance on technical keywords and code symbols compared to standard TF-IDF + Implementation of the **Query Semantic** system.
 
 ### Answerer System
-The answerer system use ollama with the given model name
+The answerer system use ollama with the given model name.
+To run the answer or answer_dataset command, you must execute this commands:
+```bash
+OLLAMA_NUM_PARALLEL=$(cat /sys/devices/system/cpu/cpu*/topology/core_id | sort -u | wc -l)
+mkdir -p ~/ollama_models
+export OLLAMA_MODELS=~/ollama_models
+ollama serve
+```
 
 ### Performance Analysis
 The system targets the following mandatory thresholds:
@@ -56,6 +63,16 @@ Initial tests showed a **Recall@5 of 94%** on documentation datasets, exceeding 
 ### Challenges Faced
 * **Path Normalization:** Ensuring file paths in the `MinimalSource` objects matched the ground truth exactly to avoid 0% recall scores.
 * **Context Limits:** Balancing the number of retrieved segments ($k$) with the LLM's token limit and the 2-second response time requirement.
+
+### Example usage
+```bash
+uv run -m src index <max_chunk_size>                                                 	# Ingestion
+uv run -m src search <prompt> <k>                                                    	# Search one prompt
+uv run -m src search_dataset <dataset_path> <save_directory> <k>                     	# Search a bunch of questions
+uv run -m src answer <prompt> <k>                                                    	# Answer one prompt
+uv run -m src answer_dataset <student_search_results_path> <save_directory>          	# Answer a bunch of questions
+uv run -m src evaluate <student_answer_path> <dataset_path> <k> <max_content_length> 	# Evaluate
+```
 
 ## Bonus
 
