@@ -5,7 +5,7 @@ VLLM_FOLDER: str = "./data/raw/vllm-0.10.1/"
 BM25_OUTPUT_PATH: str = "data/processed/bm25_index/"
 
 # Answerer system
-LLM_MODEL: str = "qwen"
+LLM_MODEL: str = "qwen3:0.6b"
 HOST: str = "http://localhost:11434"
 
 # Bonus

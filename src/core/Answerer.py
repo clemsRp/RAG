@@ -124,8 +124,7 @@ class Answerer:
             )
 
         except httpx.ReadTimeout:
-            print("pionhbiortiojhjiyotjhioyjhiotjhoiyjhno")
-            answer: str = self._get_answer(
+            answer = self._get_answer(
                 result,
                 200
             )

@@ -36,6 +36,9 @@ To ensure optimal context window usage, the system implements two distinct strat
 ### Retrieval Method
 The primary retrieval mechanism is **BM25** (via the `bm25s` library), chosen for its high performance on technical keywords and code symbols compared to standard TF-IDF + Implementation of the **Query Semantic** system.
 
+### Answerer System
+The answerer system use ollama with the given model name
+
 ### Performance Analysis
 The system targets the following mandatory thresholds:
 
