@@ -38,7 +38,7 @@ class Answerer:
 
         self.client: ollama.Client = ollama.Client(
             HOST,
-            timeout=15.0
+            timeout=45.0
         )
 
     def answer(
@@ -161,7 +161,7 @@ class Answerer:
                 self._get_source_text(source)
             )
 
-        llm_sources: str = "\n---\n".join(all_sources)[:num_character]
+        llm_sources: str = "\n---\n".join(all_sources)
 
         context = f"""ONLY use this sources to answer the question
         Sources :

@@ -52,8 +52,6 @@ The system targets the following mandatory thresholds:
 * **Recall@5 (Docs):** > 80%
 * **Recall@5 (Code):** > 50%
 
-Initial tests showed a **Recall@5 of 94%** on documentation datasets, exceeding the minimum requirements.
-
 ### Design Decisions
 * **Pydantic Models:** Used for all data structures to ensure type safety and strict JSON output compliance.
 * **Ollama Integration:** Utilized for local LLM inference to meet the 2-second per question generation constraint.

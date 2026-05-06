@@ -1,3 +1,15 @@
+
+
+
+
+
+PENSER A LA LIMITE DE CONTEXT POUR LE ANSWERER
+
+
+
+
+
+
 code:
 
 non ast/non query expansion : multi threading -> 11:12

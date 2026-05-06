@@ -6,12 +6,6 @@ DEBUGER = pdb
 install:
 	uv sync
 
-start:
-	OLLAMA_NUM_PARALLEL=$(cat /sys/devices/system/cpu/cpu*/topology/core_id | sort -u | wc -l)
-	mkdir -p ~/ollama_models
-	export OLLAMA_MODELS=~/ollama_models
-	ollama serve
-
 run:
 	uv run $(EXEC) -m $(NAME)
 
@@ -39,4 +33,4 @@ clean:
 	rm -rf *.pyc
 	rm -rf .venv .python-version main.py
 
-.PHONY: install start run debug lint lint-strict clean
+.PHONY: install run debug lint lint-strict clean
