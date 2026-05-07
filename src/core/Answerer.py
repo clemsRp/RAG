@@ -161,7 +161,7 @@ class Answerer:
                 self._get_source_text(source)
             )
 
-        llm_sources: str = "\n---\n".join(all_sources)
+        llm_sources: str = "\n---\n".join(all_sources)[:num_character]
 
         context = f"""ONLY use this sources to answer the question
         Sources :
